@@ -74,6 +74,8 @@ LOCAL_C_INCLUDES := \
 	$(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/techpack/audio/include \
         $(call include-path-for, audio-effects)
 
+LOCAL_HEADER_LIBRARIES += generated_kernel_headers audio_kernel_headers
+
 ifeq ($(strip $(AUDIO_FEATURE_ENABLED_DLKM)),true)
   LOCAL_HEADER_LIBRARIES += audio_kernel_headers
   ifneq ($(BOARD_OPENSOURCE_DIR),)
@@ -142,6 +144,8 @@ LOCAL_C_INCLUDES := \
         $(call include-path-for, audio-route) \
         $(call project-path-for,qcom-audio)/hal/audio_extn \
         external/tinycompress/include
+
+LOCAL_HEADER_LIBRARIES += generated_kernel_headers audio_kernel_headers
 
 ifeq ($(strip $(AUDIO_FEATURE_ENABLED_DLKM)),true)
   LOCAL_HEADER_LIBRARIES += audio_kernel_headers
