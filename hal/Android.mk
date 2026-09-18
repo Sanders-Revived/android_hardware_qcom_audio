@@ -76,6 +76,10 @@ LOCAL_CFLAGS += -Wno-macro-redefined
 
 LOCAL_HEADER_LIBRARIES := libhardware_headers
 
+ifeq ($(ENABLE_AUDIO_LEGACY_TECHPACK),true)
+  LOCAL_HEADER_LIBRARIES += qti_legacy_audio_kernel_uapi
+endif
+
 LOCAL_SRC_FILES := \
 	audio_hw.c \
 	voice.c \
@@ -86,14 +90,21 @@ LOCAL_SRC_FILES := \
 LOCAL_SRC_FILES += audio_extn/audio_extn.c \
                    audio_extn/utils.c
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/audio
 LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/techpack/audio/include
 LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 
 ifeq ($(strip $(AUDIO_FEATURE_ENABLED_DLKM)),true)
   LOCAL_HEADER_LIBRARIES += audio_kernel_headers
-  LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/vendor/qcom/opensource/audio-kernel/include
+  ifneq ($(BOARD_OPENSOURCE_DIR),)
+    LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/$(BOARD_OPENSOURCE_DIR)/audio-kernel/include
+  else
+    LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/vendor/qcom/opensource/audio-kernel/include
+  endif
   LOCAL_ADDITIONAL_DEPENDENCIES += $(BOARD_VENDOR_KERNEL_MODULES)
 endif
+# 4.19: for msm8996 legacy (no audio-kernel DLKM for 8996 in techpack), keep
+# AUDIO_FEATURE_ENABLED_DLKM=false and rely on KERNEL_OBJ/usr + techpack/audio/include
 
 ifeq ($(strip $(AUDIO_FEATURE_ENABLED_EXTENDED_COMPRESS_FORMAT)),true)
   LOCAL_CFLAGS += -DENABLE_EXTENDED_COMPRESS_FORMAT
@@ -372,6 +383,8 @@ ifeq ($(strip $(AUDIO_FEATURE_ENABLED_LISTEN)),true)
 endif
 
 ifeq ($(TARGET_COMPILE_WITH_MSM_KERNEL),true)
+        LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include
+        LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/include/audio
         LOCAL_C_INCLUDES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr/techpack/audio/include
         LOCAL_ADDITIONAL_DEPENDENCIES += $(TARGET_OUT_INTERMEDIATES)/KERNEL_OBJ/usr
 endif
